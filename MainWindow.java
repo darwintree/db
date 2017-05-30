@@ -121,6 +121,14 @@ public class MainWindow {
 
         JMenuItem mntmClose = new JMenuItem("Close");
         mnNewMenu.add(mntmClose);
+        mntmClose.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				frame.dispose();
+			}
+		});
 
         JMenu mnSearch = new JMenu("Search");
         menuBar.add(mnSearch);
