@@ -6,7 +6,7 @@ import net.contentobjects.jnotify.JNotifyException;
 public class Main {
 
     public static void main(String[] args) {
-        System.err.println(System.getProperty("java.library.path"));
+        //System.err.println(System.getProperty("java.library.path"));
         System.err.println("开始监听目录下内容......");
         try {
             Main.sample();
