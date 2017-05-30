@@ -96,6 +96,7 @@ public class MainWindow {
         useTime=false;
         useName=false;
         dbt=new DBTest();
+        dbt.rootPath="e:\\newFolder";
         fl=new LinkedList<String>();
         nl=new LinkedList<String>();
         selectpath=null;
@@ -121,8 +122,7 @@ public class MainWindow {
 
         JMenuItem mntmClose = new JMenuItem("Close");
         mnNewMenu.add(mntmClose);
-        mntmClose.addActionListener(new ActionListener() {
-			
+        mntmClose.addActionListener(new ActionListener() {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
@@ -648,7 +648,7 @@ public class MainWindow {
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
 				try {
-					String sp=new String("e:\\"+selectpath);
+					String sp=new String(selectpath);
 					java.awt.Desktop.getDesktop().open(new java.io.File(sp));
 				} catch (IOException e1) {
 					// TODO 自动生成的 catch 块
@@ -665,7 +665,7 @@ public class MainWindow {
 				try {
 	
 					int lastslash=selectpath.lastIndexOf("\\");
-					String sp=new String("e:\\"+selectpath.substring(0, lastslash));
+					String sp=new String(selectpath.substring(0, lastslash));
 					java.awt.Desktop.getDesktop().open(new java.io.File(sp));
 				} catch (IOException e1) {
 					// TODO 自动生成的 catch 块
