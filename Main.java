@@ -25,25 +25,19 @@ public class Main {
 
         //要监控哪个目录
         String path = "e:\\newFolder";
-
         //监控用户的操作，增，删，改，重命名
         int mask = JNotify.FILE_CREATED | JNotify.FILE_DELETED | JNotify.FILE_MODIFIED | JNotify.FILE_RENAMED ;
-
         //是否监控子目录
         boolean subTree = true;
-
         //开始监控
         CourseDesignModel m = new DBTest();
         DBTest db = (DBTest) m;
         db.setCurID(db.getCurMaxID());
         int watchID = JNotify.addWatch(path, mask, subTree, new FileWatcher(m));
-
         //睡一会，看看效果
         Thread.sleep(1000 * 60 * 3);
-
         //停止监控
         boolean res = JNotify.removeWatch(watchID);
-
         if (res) {
             System.err.println("已停止监听");
         }
