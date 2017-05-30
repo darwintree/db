@@ -37,27 +37,23 @@ import javax.swing.event.ChangeListener;
 public class MainWindow {
 
     private JFrame frame;
-    private JTextField textField;
-    private JTextField textField_1;
-    private JTextField textField_2;
-    private JTextField textField_3;
-    private JTextField textField_4;
-    private int typefile;
-    private int typefolder;
-    private int minsize;
-    private int maxsize;
-    private int mintime;
-    private int maxtime;
+    private JTextField textField;//最上面的那个输入名字的编辑框
+    private JTextField textField_1;//Min Size 编辑框
+    private JTextField textField_2;//Max Size编辑框
+    private JTextField textField_3;//StartTime编辑框
+    private JTextField textField_4;//EndTime编辑框
+    private int typefile;//记录是否搜索文件，是为1，否为0
+    private int typefolder;//记录是否搜索文件夹，是为1，否为0
     private int order;//0升序  1降序
-    private String name;
-    private boolean useTime;
-    private boolean useSize;
-    private boolean useName;
+    private String name;//记录搜索框中输入的文件名
+    private boolean useTime;//是否通过时间筛选
+    private boolean useSize;//是否通过大小筛选
+    private boolean useName;//是否通过名称筛选
     private DBTest dbt;
     private LinkedList<String> fl;//储存返回的列表(绝对路径列表)
     private LinkedList<String> nl;//储存姓名的列表
-    JList nameList;
-    JList posList;
+    JList nameList;		//GUI中显示姓名的列表
+    JList posList;      //GUI中显示绝对路径的列表
 
     /**
      * Launch the application.
@@ -81,10 +77,7 @@ public class MainWindow {
     public MainWindow() {
         typefile=0;
         typefolder=0;
-        minsize=0;
-        maxsize=0;
-        mintime=0;
-        maxtime=0;
+
         order=0;
         useSize=false;
         useTime=false;
@@ -102,6 +95,7 @@ public class MainWindow {
      */
     private void initialize() {
         frame = new JFrame();
+        //窗口大小
         frame.setBounds(100, 100, 550, 620);
         //frame.setSize( 550, 620);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -132,7 +126,7 @@ public class MainWindow {
 
             }
         });
-
+        //选项菜单search by folder
         JCheckBoxMenuItem chckbxmntmNewCheckItem_1 = new JCheckBoxMenuItem("Folder");
         mnSearch.add(chckbxmntmNewCheckItem_1);
         chckbxmntmNewCheckItem_1.addActionListener(new ActionListener() {
@@ -147,7 +141,7 @@ public class MainWindow {
 
             }
         });
-
+        //选项菜单search by name
         JCheckBoxMenuItem chckbxmntmNewCheckItem_byname = new JCheckBoxMenuItem("search by name");
         mnSearch.add(chckbxmntmNewCheckItem_byname);
         chckbxmntmNewCheckItem_byname.addActionListener(new ActionListener() {
@@ -162,7 +156,7 @@ public class MainWindow {
 
             }
         });
-
+        //选项菜单search by size
         JCheckBoxMenuItem chckbxmntmNewCheckItem_2 = new JCheckBoxMenuItem("search by size");
         mnSearch.add(chckbxmntmNewCheckItem_2);
         chckbxmntmNewCheckItem_2.addActionListener(new ActionListener() {
@@ -177,7 +171,7 @@ public class MainWindow {
 
             }
         });
-
+        //选项菜单search by lastmodified
         JCheckBoxMenuItem chckbxmntmNewCheckItem_3 = new JCheckBoxMenuItem("search by lastmotified");
         mnSearch.add(chckbxmntmNewCheckItem_3);
         chckbxmntmNewCheckItem_3.addActionListener(new ActionListener() {
@@ -294,7 +288,7 @@ public class MainWindow {
                     }
 
 
-                    //文件夹
+                    //文件夹 其余代码同功能类比上述
                     if(typefile==0&&typefolder==1){
                         if(useSize&&useTime){
                             if(order==0)
@@ -450,6 +444,7 @@ public class MainWindow {
                 }
                 fl=new LinkedList();
                 fl.add("E:\\aaaa\\bbbb");
+                fl.add("D:\\aaaa\\bddddb");
                 //将两个列表输出到namelist和poslist视图区
                 DefaultListModel dlm1=new DefaultListModel();
                 DefaultListModel dlm2=new DefaultListModel();
@@ -468,6 +463,9 @@ public class MainWindow {
                     }
                     nameList.setModel(dlm1);
                     posList.setModel(dlm2);
+
+                    fl.clear();
+                    nl.clear();
                 }
 
 
