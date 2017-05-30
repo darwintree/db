@@ -25,11 +25,13 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.awt.FlowLayout;
 import javax.swing.JTextField;
@@ -62,8 +64,12 @@ public class MainWindow {
     private DBTest dbt;
     private LinkedList<String> fl;//储存返回的列表(绝对路径列表)
     private LinkedList<String> nl;//储存姓名的列表
+    private LinkedList<String> sl;
+    private LinkedList<String> tl;
     JList<String> nameList;		//GUI中显示姓名的列表
     JList<String> posList;      //GUI中显示绝对路径的列表
+    JList<String> sizeList;		
+    JList<String> timeList;      
     JPopupMenu popmenu;
     String selectpath;			//
     
@@ -88,17 +94,19 @@ public class MainWindow {
      * Create the application.
      */
     public MainWindow() {
-        typefile=0;
-        typefolder=0;
+        typefile=1;
+        typefolder=1;
 
         order=0;
         useSize=false;
         useTime=false;
-        useName=false;
+        useName=true;
         dbt=new DBTest();
         dbt.rootPath="e:\\newFolder";
         fl=new LinkedList<String>();
         nl=new LinkedList<String>();
+        sl=new LinkedList<String>();
+        tl=new LinkedList<String>();
         selectpath=null;
         initialize();
 
@@ -110,7 +118,7 @@ public class MainWindow {
     private void initialize() {
         frame = new JFrame();
         //窗口大小
-        frame.setBounds(100, 100, 550, 620);
+        frame.setBounds(100, 100, 900, 620);
         //frame.setSize( 550, 620);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -135,6 +143,7 @@ public class MainWindow {
 
         JCheckBoxMenuItem chckbxmntmNewCheckItem = new JCheckBoxMenuItem("File");
         mnSearch.add(chckbxmntmNewCheckItem);
+        chckbxmntmNewCheckItem.setSelected(true);
         chckbxmntmNewCheckItem.addActionListener(new ActionListener() {
 
             @Override
@@ -150,6 +159,7 @@ public class MainWindow {
         //选项菜单search by folder
         JCheckBoxMenuItem chckbxmntmNewCheckItem_1 = new JCheckBoxMenuItem("Folder");
         mnSearch.add(chckbxmntmNewCheckItem_1);
+        chckbxmntmNewCheckItem_1.setSelected(true);
         chckbxmntmNewCheckItem_1.addActionListener(new ActionListener() {
 
             @Override
@@ -165,6 +175,7 @@ public class MainWindow {
         //选项菜单search by name
         JCheckBoxMenuItem chckbxmntmNewCheckItem_byname = new JCheckBoxMenuItem("search by name");
         mnSearch.add(chckbxmntmNewCheckItem_byname);
+        chckbxmntmNewCheckItem_byname.setSelected(true);
         chckbxmntmNewCheckItem_byname.addActionListener(new ActionListener() {
 
             @Override
@@ -218,7 +229,7 @@ public class MainWindow {
 
         textField = new JTextField();
         panel_1.add(textField);
-        textField.setColumns(40);
+        textField.setColumns(60);
 
         JButton btnNewButton = new JButton("Search");
         panel_1.add(btnNewButton);
@@ -469,6 +480,8 @@ public class MainWindow {
                 //将两个列表输出到namelist和poslist视图区
                 DefaultListModel dlm1=new DefaultListModel();
                 DefaultListModel dlm2=new DefaultListModel();
+                DefaultListModel dlm3=new DefaultListModel();
+                DefaultListModel dlm4=new DefaultListModel();
                 if(fl==null){
                     System.out.println("fl is null!");
                 }
@@ -476,8 +489,17 @@ public class MainWindow {
                     for(String str:fl){
                         //将fl中元素str的文件名取出
                         int a=str.lastIndexOf("\\");
+                        
                         String Name=str.substring(a+1, str.length());
                         nl.add(Name);
+                        File f=new File(str);
+                        if(f.isDirectory())
+                        	sl.add(" ");
+                        else
+                        	sl.add(Long.toString(f.length()/1024)+"KB");
+                        Date d=new Date(f.lastModified());
+                        
+                        tl.add(sdf.format(d));
                     }
                     for(String str:nl){
                         dlm1.addElement(str);
@@ -485,11 +507,21 @@ public class MainWindow {
                     for(String str:fl){
                         dlm2.addElement(str);
                     }
+                    for(String str:sl){
+                        dlm3.addElement(str);
+                    }
+                    for(String str:tl){
+                        dlm4.addElement(str);
+                    }
                     nameList.setModel(dlm1);
                     posList.setModel(dlm2);
+                    sizeList.setModel(dlm3);
+                    timeList.setModel(dlm4);
 
                     fl.clear();
                     nl.clear();
+                    sl.clear();
+                    tl.clear();
                 }
 
 
@@ -571,25 +603,39 @@ public class MainWindow {
         paixu.add(jrbuttonsx);
 
         JPanel listpanel=new JPanel();
-        listpanel.setLayout(new GridLayout(1, 1));
+        listpanel.setLayout(new GridLayout(1, 4));
 
         nameList=new JList<String>();
         posList=new JList<String>();
+        sizeList=new JList<String>();
+        timeList=new JList<String>();
         JScrollPane nsp=new JScrollPane(nameList);
         JScrollPane psp=new JScrollPane(posList);
+        JScrollPane ssp=new JScrollPane(sizeList);
+        JScrollPane tsp=new JScrollPane(timeList);
         JScrollBar nsb= nsp.getVerticalScrollBar();
         JScrollBar psb= psp.getVerticalScrollBar();
+        JScrollBar ssb= ssp.getVerticalScrollBar();
+        JScrollBar tsb= tsp.getVerticalScrollBar();
         nsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        psb.addAdjustmentListener(new AdjustmentListener() {
+        ssp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        psp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        tsb.addAdjustmentListener(new AdjustmentListener() {
 			
 			@Override
 			public void adjustmentValueChanged(AdjustmentEvent e) {
 				// TODO 自动生成的方法存根
-				nsb.setValue(psb.getValue());
+				nsb.setValue(tsb.getValue());
+				psb.setValue(tsb.getValue());
+				ssb.setValue(tsb.getValue());
 			}
 		});
+        
         listpanel.add(nsp);
         listpanel.add(psp);
+        listpanel.add(ssp);
+        listpanel.add(tsp);
+        
         DefaultListModel dlm = new DefaultListModel();
         dlm.addElement("日期格式yy-mm-dd hh:mm:ss");
         nameList.setModel(dlm);
@@ -601,7 +647,9 @@ public class MainWindow {
 			public void valueChanged(ListSelectionEvent e) {
 				// TODO 自动生成的方法存根
 				int index=nameList.getSelectedIndex();
-				posList.setSelectedIndex(index);				
+				posList.setSelectedIndex(index);
+				sizeList.setSelectedIndex(index);
+				timeList.setSelectedIndex(index);
 			}
 		});
         posList.addListSelectionListener(new ListSelectionListener() {
@@ -610,7 +658,31 @@ public class MainWindow {
 			public void valueChanged(ListSelectionEvent e) {
 				// TODO 自动生成的方法存根
 				int index=posList.getSelectedIndex();
-				nameList.setSelectedIndex(index);				
+				nameList.setSelectedIndex(index);
+				sizeList.setSelectedIndex(index);
+				timeList.setSelectedIndex(index);
+			}
+		});
+        sizeList.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO 自动生成的方法存根
+				int index=sizeList.getSelectedIndex();
+				nameList.setSelectedIndex(index);
+				posList.setSelectedIndex(index);
+				timeList.setSelectedIndex(index);
+			}
+		});
+        timeList.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO 自动生成的方法存根
+				int index=timeList.getSelectedIndex();
+				nameList.setSelectedIndex(index);
+				sizeList.setSelectedIndex(index);
+				posList.setSelectedIndex(index);
 			}
 		});
         
@@ -640,7 +712,91 @@ public class MainWindow {
 				      
 				}
 			}
-		});       
+		});      
+        timeList.addMouseListener(new MouseListener() {			
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {	}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO 自动生成的方法存根
+				if (e.getButton()==MouseEvent.BUTTON3) {  
+					 int index = timeList.locationToIndex(e.getPoint());  
+					 nameList.setSelectedIndex(index);  
+				      sizeList.setSelectedIndex(index);
+				      //timeList.setSelectedIndex(index);  
+				      posList.setSelectedIndex(index);
+				      selectpath=posList.getSelectedValue();
+				      popmenu.show(timeList, e.getX(), e.getY());
+				      
+				}
+			}
+		});  
+        posList.addMouseListener(new MouseListener() {			
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {	}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO 自动生成的方法存根
+				if (e.getButton()==MouseEvent.BUTTON3) {  
+					 int index = posList.locationToIndex(e.getPoint());  
+					 nameList.setSelectedIndex(index);  
+				      sizeList.setSelectedIndex(index);
+				      timeList.setSelectedIndex(index);  
+				      //posList.setSelectedIndex(index);
+				      selectpath=posList.getSelectedValue();
+				      popmenu.show(posList, e.getX(), e.getY());
+				      
+				}
+			}
+		});  
+        sizeList.addMouseListener(new MouseListener() {			
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {	}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO 自动生成的方法存根
+				if (e.getButton()==MouseEvent.BUTTON3) {  
+					 int index = sizeList.locationToIndex(e.getPoint());  
+				      nameList.setSelectedIndex(index);  
+				      posList.setSelectedIndex(index);
+				      timeList.setSelectedIndex(index);  
+				      //sizeList.setSelectedIndex(index);
+				      selectpath=posList.getSelectedValue();
+				      popmenu.show(sizeList, e.getX(), e.getY());
+				      
+				}
+			}
+		});  
         popmenu=new JPopupMenu();
         JMenuItem openfile1=new JMenuItem("打开此文件");
         openfile1.addActionListener(new ActionListener() {			
