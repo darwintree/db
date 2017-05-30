@@ -24,7 +24,7 @@ public class Main {
     private static void sample() throws JNotifyException, InterruptedException {
 
         //要监控哪个目录
-        String path = "F:\\";
+        String path = "e:\\newFolder";
 
         //监控用户的操作，增，删，改，重命名
         int mask = JNotify.FILE_CREATED | JNotify.FILE_DELETED | JNotify.FILE_MODIFIED | JNotify.FILE_RENAMED ;

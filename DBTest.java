@@ -132,14 +132,15 @@ public class DBTest implements CourseDesignModel{
 		return ID;
 	}
 	public int getID(String absolutePath){ //通过绝对路径在数据库中查找文件ID
+		if(absolutePath.equals("")) return 1;
 		String[] splitedName=absolutePath.split("\\\\");
 		int ID=1;
-		for(int i=1;i<splitedName.length;i++)
+		for(int i=0;i<splitedName.length;i++)
 			ID=getIDDirect(splitedName[i],ID);
 		return ID;
 	}
 	public static void main(String args[]){
-		String rootPath="g:\\";
+		String rootPath="e:\\newFolder";
 		DBTest dbt=new DBTest();
 		dbt.initDB(rootPath);
 	}
@@ -255,8 +256,8 @@ public class DBTest implements CourseDesignModel{
 	}
 	@Override
 	public void onModify(String rootPath, String name){
-		int ID=getID(rootPath+name); //��ȡ��ǰ�ļ���ID
-		File currentFile=new File(rootPath+name);
+		int ID=getID(name); //��ȡ��ǰ�ļ���ID
+		File currentFile=new File(rootPath+"\\"+name);
 		String Query;
 		long size=currentFile.length();
 		long occupiedSpace=(size+1024)/1024*1024;
@@ -299,17 +300,23 @@ public class DBTest implements CourseDesignModel{
 	@Override
 	public void onCreate(String rootPath, String name) {
 		// TODO Auto-generated method stub
-		String parentAbsolutePath=""; //新建文件父目录的绝对路径
-		String absolutePath=rootPath+name;
+		//String parentAbsolutePath=""; //新建文件父目录的绝对路径
+		String parentAbsolutePath="";
+		String absolutePath=rootPath+"\\"+name;
 		//String [] sub=absolutePath.split("\\\\");
 		String [] sub=name.split("\\\\");
-		for(int i=0;i<sub.length-2;i++) parentAbsolutePath=parentAbsolutePath+sub[i]+"\\";
-		parentAbsolutePath=parentAbsolutePath+sub[sub.length-2];
+		if(sub.length>1) parentAbsolutePath+=sub[0];
+		for(int i=1;i<sub.length-1;i++) parentAbsolutePath=parentAbsolutePath+"\\"+sub[i];
+		//parentAbsolutePath=parentAbsolutePath+sub[sub.length-2];
 		File currentFile=new File(absolutePath);
-		//int parentID=getID(parentAbsolutePath); //获取新建文件父目录的ID
-		int parentID=getID(rootPath+parentAbsolutePath);
+		//System.out.println(parentAbsolutePath);
+		int parentID=getID(parentAbsolutePath); //获取新建文件父目录的ID
+		//System.out.println(parentID);
+		//int parentID=getID(rootPath+parentAbsolutePath);
+		//System.out.println(parentID);
 		int ID=++cur_id; //给新建的文件分配ID
 		//获取新建文件的信息
+		//System.out.println(ID);
 		long lastModifiedTime=currentFile.lastModified();
 	    long size=currentFile.length();
         long occupiedSpace=size;
@@ -321,27 +328,29 @@ public class DBTest implements CourseDesignModel{
         else if(canRead&&!canWrite) access=0;
 	    else if(!canRead&&canWrite) access=1;
         //将新建文件插入到数据库中
-		if(currentFile.isDirectory()) insertIntoFolderValues(ID,name,parentID,lastModifiedTime,access,depth); 
-		else insertIntoFileValues(ID,name,parentID,lastModifiedTime,size,occupiedSpace,access,depth);
+		if(currentFile.isDirectory()) insertIntoFolderValues(ID,sub[sub.length-1],parentID,lastModifiedTime,access,depth); 
+		else insertIntoFileValues(ID,sub[sub.length-1],parentID,lastModifiedTime,size,occupiedSpace,access,depth);
 	}
 	@Override
 	public void onDelete(String rootPath, String name) {
 		// TODO Auto-generated method stub
-		deleteFile(rootPath+name);
+		deleteFile(name);
 	}
 	@Override
 	public void onRename(String rootPath, String oldName, String newName) {
 		// TODO Auto-generated method stub
-		String absolutePath=rootPath+oldName;
-		int ID=getID(absolutePath);
-		File currentFile=new File(rootPath+newName);
+		//String absolutePath=rootPath+oldName;
+		int ID=getID(oldName);
+		File currentFile=new File(rootPath+"\\"+newName);
+		String [] sub=newName.split("\\\\");
+		
 		String Query;
 		PreparedStatement pStmt;
 		try{
 			if(currentFile.isDirectory()) Query="update my_folder set name = (?) where ID=(?)";
 			else Query="update my_file set name = (?) where ID=(?)";
 			pStmt=conn.prepareStatement(Query);
-			pStmt.setString(1, newName);
+			pStmt.setString(1, sub[sub.length-1]);
 			pStmt.setInt(2, ID);
 			pStmt.executeUpdate();
 		}catch(SQLException e){
@@ -352,20 +361,7 @@ public class DBTest implements CourseDesignModel{
 	@Override
 	public LinkedList<String> filterByName(String name, String mode) {
 		// TODO Auto-generated method stub
-		LinkedList<String> result=new LinkedList<String>();
-		PreparedStatement lookUpFromFile,LookUpFromFolder;
-		if(mode.equals("acs")){
-			String Query1="select ID from my_file where name like (?) order by ID asc";
-			String Query2="select ID from my_folder where name like (?) order by ID desc";
-			try{
-				lookUpFromFile=conn.prepareStatement(Query1);
-				LookUpFromFolder=conn.prepareStatement(Query2);
-				 
-			}catch(SQLException e){
-				e.printStackTrace();
-			}
-			
-		}
+
 		
 		return null;
 	}
