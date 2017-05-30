@@ -146,11 +146,11 @@ public class DBTest implements CourseDesignModel{
 		
 		DBTest dbt=new DBTest();
 		dbt.rootPath="e:\\newFolder";
-		dbt.initDB(dbt.rootPath);
-		//LinkedList<String> lst=dbt.filterBySizeAndName("s",1024,4096, "asc");
-		//for(String i:lst)
-			//System.out.println(i);
-		//System.out.print("finished");
+		//dbt.initDB(dbt.rootPath);
+		LinkedList<String> lst=dbt.filterBySizeAndName("s",1024,4096, "asc");
+		for(String i:lst)
+			System.out.println(i);
+		System.out.print("finished");
 		//System.out.println(dbt.getAbsolutePathByID(5));
 		
 	}
