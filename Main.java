@@ -10,6 +10,7 @@ public class Main {
         System.err.println("开始监听目录下内容......");
         try {
             Main.sample();
+            //同步测试
         } catch (Exception e) {
             e.printStackTrace();
         }
