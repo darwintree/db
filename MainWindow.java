@@ -13,11 +13,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -554,8 +558,21 @@ public class MainWindow {
 
         nameList=new JList();
         posList=new JList();
-        listpanel.add(nameList);
-        listpanel.add(posList);
+        JScrollPane nsp=new JScrollPane(nameList);
+        JScrollPane psp=new JScrollPane(posList);
+        JScrollBar nsb= nsp.getVerticalScrollBar();
+        JScrollBar psb= psp.getVerticalScrollBar();
+        nsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        psb.addAdjustmentListener(new AdjustmentListener() {
+			
+			@Override
+			public void adjustmentValueChanged(AdjustmentEvent e) {
+				// TODO 自动生成的方法存根
+				nsb.setValue(psb.getValue());
+			}
+		});
+        listpanel.add(nsp);
+        listpanel.add(psp);
         DefaultListModel dlm = new DefaultListModel();
         dlm.addElement("日期格式yy-mm-dd hh:mm:ss");
         nameList.setModel(dlm);
