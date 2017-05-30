@@ -12,6 +12,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -22,6 +23,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -37,6 +41,8 @@ import javax.swing.JList;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class MainWindow {
 
@@ -56,8 +62,11 @@ public class MainWindow {
     private DBTest dbt;
     private LinkedList<String> fl;//储存返回的列表(绝对路径列表)
     private LinkedList<String> nl;//储存姓名的列表
-    JList nameList;		//GUI中显示姓名的列表
-    JList posList;      //GUI中显示绝对路径的列表
+    JList<String> nameList;		//GUI中显示姓名的列表
+    JList<String> posList;      //GUI中显示绝对路径的列表
+    JPopupMenu popmenu;
+    String selectpath;			//
+    
 
     /**
      * Launch the application.
@@ -89,7 +98,7 @@ public class MainWindow {
         dbt=new DBTest();
         fl=new LinkedList<String>();
         nl=new LinkedList<String>();
-
+        selectpath=null;
         initialize();
 
     }
@@ -556,8 +565,8 @@ public class MainWindow {
         JPanel listpanel=new JPanel();
         listpanel.setLayout(new GridLayout(1, 1));
 
-        nameList=new JList();
-        posList=new JList();
+        nameList=new JList<String>();
+        posList=new JList<String>();
         JScrollPane nsp=new JScrollPane(nameList);
         JScrollPane psp=new JScrollPane(posList);
         JScrollBar nsb= nsp.getVerticalScrollBar();
@@ -576,8 +585,89 @@ public class MainWindow {
         DefaultListModel dlm = new DefaultListModel();
         dlm.addElement("日期格式yy-mm-dd hh:mm:ss");
         nameList.setModel(dlm);
-
+        
         frame.add(listpanel);
+        nameList.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO 自动生成的方法存根
+				int index=nameList.getSelectedIndex();
+				posList.setSelectedIndex(index);				
+			}
+		});
+        posList.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				// TODO 自动生成的方法存根
+				int index=posList.getSelectedIndex();
+				nameList.setSelectedIndex(index);				
+			}
+		});
+        
+        
+        nameList.addMouseListener(new MouseListener() {			
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {	}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO 自动生成的方法存根
+				if (e.getButton()==MouseEvent.BUTTON3) {  
+					 int index = nameList.locationToIndex(e.getPoint());  
+				      nameList.setSelectedIndex(index);  
+				      posList.setSelectedIndex(index);
+				      selectpath=posList.getSelectedValue();
+				      popmenu.show(nameList, e.getX(), e.getY());
+				      
+				}
+			}
+		});       
+        popmenu=new JPopupMenu();
+        JMenuItem openfile1=new JMenuItem("打开此文件");
+        openfile1.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				try {
+					String sp=new String("e:\\"+selectpath);
+					java.awt.Desktop.getDesktop().open(new java.io.File(sp));
+				} catch (IOException e1) {
+					// TODO 自动生成的 catch 块
+					e1.printStackTrace();
+				}
+				
+			}
+		});
+        JMenuItem openfile2=new JMenuItem("打开此文件所在文件夹");
+        openfile2.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				try {
+	
+					int lastslash=selectpath.lastIndexOf("\\");
+					String sp=new String("e:\\"+selectpath.substring(0, lastslash));
+					java.awt.Desktop.getDesktop().open(new java.io.File(sp));
+				} catch (IOException e1) {
+					// TODO 自动生成的 catch 块
+					e1.printStackTrace();
+				}
+				
+			}
+		});
+        popmenu.add(openfile1);
+        popmenu.add(openfile2);
     }
 
 
