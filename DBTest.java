@@ -14,6 +14,7 @@ public class DBTest implements CourseDesignModel{
 	String url;//链接地址
 	PreparedStatement insertIntoFile;
 	PreparedStatement insertIntoFolder;
+	String rootPath;
 	Connection conn;
 	DBTest(){
 		try{
@@ -221,6 +222,36 @@ public class DBTest implements CourseDesignModel{
 	}
 	public void setCurID(int cur_id){
 		this.cur_id=cur_id;
+	}
+	public String getAbsolutePathByID(int ID){
+		String Query1="select * from my_file where ID=(?)";
+		String Query2="select * from my_folder where ID=(?)";
+		int parentID=0;
+		String name="";
+		PreparedStatement pStmt1,pStmt2;
+		try{
+			pStmt1=conn.prepareStatement(Query1);
+			pStmt2=conn.prepareStatement(Query2);
+			pStmt1.setInt(1, ID);
+			pStmt2.setInt(1, ID);
+			ResultSet rs2=pStmt2.executeQuery();
+			ResultSet rs1=pStmt1.executeQuery();
+			
+			if(rs1.next()){
+				//it's a file
+				parentID=rs1.getInt(3);
+				name=rs1.getString(2);
+			}
+			else{
+				parentID=rs2.getInt(3);
+				name=rs2.getString(2);
+			}
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		if(parentID==0) return rootPath;
+		else return getAbsolutePathByID(parentID)+"\\"+name;
 	}
 	@Override
 	public void onModify(String rootPath, String name){

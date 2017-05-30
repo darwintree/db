@@ -35,7 +35,7 @@ public class Main {
         //开始监控
         CourseDesignModel m = new DBTest();
         DBTest db = (DBTest) m;
-
+        db.setCurID(db.getCurMaxID());
         int watchID = JNotify.addWatch(path, mask, subTree, new FileWatcher(m));
 
         //睡一会，看看效果
