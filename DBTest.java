@@ -140,9 +140,11 @@ public class DBTest implements CourseDesignModel{
 		return ID;
 	}
 	public static void main(String args[]){
+		System.out.println("start..");
 		String rootPath="e:\\newFolder";
 		DBTest dbt=new DBTest();
 		dbt.initDB(rootPath);
+		System.out.println("end..");
 	}
 	public void deleteFileDirect(int ID){ //直接按ID删除一条my_file 中的记录
 		String Query="delete from my_file where ID=(?)";

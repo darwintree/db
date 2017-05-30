@@ -228,7 +228,7 @@ public class MainWindow {
 					textField.setText("1");
 				if(!useSize&&!useTime)
 					textField.setText("0");*/
-                fl.add("E:\\sdsd\\aaaa");
+                //fl.add("E:\\sdsd\\aaaa");
                 if(typefile==0&&typefolder==0){
                     JOptionPane.showMessageDialog(frame, "请选择搜索类型");
                     return;
@@ -448,6 +448,9 @@ public class MainWindow {
                 //将两个列表输出到namelist和poslist视图区
                 DefaultListModel dlm1=new DefaultListModel();
                 DefaultListModel dlm2=new DefaultListModel();
+                if(fl==null){
+                    System.out.println("fl is null!");
+                }
                 if(fl!=null&&!fl.isEmpty()){
                     for(String str:fl){
                         //将fl中元素str的文件名取出
