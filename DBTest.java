@@ -140,20 +140,12 @@ public class DBTest implements CourseDesignModel{
 		return ID;
 	}
 	public static void main(String args[]){
-<<<<<<< HEAD
 		System.out.println("start..");
 		String rootPath="e:\\newFolder";
 		DBTest dbt=new DBTest();
 		dbt.initDB(rootPath);
 		System.out.println("end..");
-=======
-		
-		DBTest dbt=new DBTest();
-		dbt.rootPath="e:\\newFolder";
-		dbt.initDB(dbt.rootPath);
-		//System.out.println(dbt.getAbsolutePathByID(5));
-		
->>>>>>> origin/master
+
 	}
 	public void deleteFileDirect(int ID){ //直接按ID删除一条my_file 中的记录
 		String Query="delete from my_file where ID=(?)";
@@ -340,7 +332,7 @@ public class DBTest implements CourseDesignModel{
         else if(canRead&&!canWrite) access=0;
 	    else if(!canRead&&canWrite) access=1;
         //将新建文件插入到数据库中
-		if(currentFile.isDirectory()) insertIntoFolderValues(ID,sub[sub.length-1],parentID,lastModifiedTime,access,depth); 
+		if(currentFile.isDirectory()) insertIntoFolderValues(ID,sub[sub.length-1],parentID,lastModifiedTime,access,depth);
 		else insertIntoFileValues(ID,sub[sub.length-1],parentID,lastModifiedTime,size,occupiedSpace,access,depth);
 	}
 	@Override
