@@ -301,11 +301,13 @@ public class DBTest implements CourseDesignModel{
 		// TODO Auto-generated method stub
 		String parentAbsolutePath=""; //新建文件父目录的绝对路径
 		String absolutePath=rootPath+name;
-		String [] sub=absolutePath.split("\\\\");
+		//String [] sub=absolutePath.split("\\\\");
+		String [] sub=name.split("\\\\");
 		for(int i=0;i<sub.length-2;i++) parentAbsolutePath=parentAbsolutePath+sub[i]+"\\";
 		parentAbsolutePath=parentAbsolutePath+sub[sub.length-2];
 		File currentFile=new File(absolutePath);
-		int parentID=getID(parentAbsolutePath); //获取新建文件父目录的ID
+		//int parentID=getID(parentAbsolutePath); //获取新建文件父目录的ID
+		int parentID=getID(rootPath+parentAbsolutePath);
 		int ID=++cur_id; //给新建的文件分配ID
 		//获取新建文件的信息
 		long lastModifiedTime=currentFile.lastModified();
@@ -350,12 +352,27 @@ public class DBTest implements CourseDesignModel{
 	@Override
 	public LinkedList<String> filterByName(String name, String mode) {
 		// TODO Auto-generated method stub
+		LinkedList<String> result=new LinkedList<String>();
+		PreparedStatement lookUpFromFile,LookUpFromFolder;
+		if(mode.equals("acs")){
+			String Query1="select ID from my_file where name like (?) order by ID asc";
+			String Query2="select ID from my_folder where name like (?) order by ID desc";
+			try{
+				lookUpFromFile=conn.prepareStatement(Query1);
+				LookUpFromFolder=conn.prepareStatement(Query2);
+				 
+			}catch(SQLException e){
+				e.printStackTrace();
+			}
+			
+		}
 		
 		return null;
 	}
 	@Override
 	public LinkedList<String> filterBySize(long minKb, long maxKb, String mode) {
 		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -386,37 +403,89 @@ public class DBTest implements CourseDesignModel{
 
 	@Override
 	public LinkedList<String> fileFilterByName(String name, String mode) {
-		return null;
+		/*String Query="select ID from my_file where name likes(?)";
+		PreparedStatement pStmt;
+		ResultSet rs;
+		LinkedList<String> lst=new LinkedList<String>();
+		try{
+			if(mode.equals("acs")) Query+="order by name acs";
+			else if(mode.equals("desc")) Query+="order by name desc";
+			else{
+				System.err.println("不能识别模式");
+				return null;
+			}
+			pStmt=conn.prepareStatement(Query);
+			pStmt.setString(0, "%"+name+"%");
+			rs=pStmt.executeQuery();
+			while(rs.next()){
+				int ID=rs.getInt(1);
+				String absolutePath=getAbsolutePathByID(ID);
+				lst.add(absolutePath);
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}*/
+		LinkedList<String> lst=executeFileQuery(name,0,0,0,0,0,mode);
+		return lst;
 	}
 
 	@Override
 	public LinkedList<String> fileFilterBySize(long minKb, long maxKb, String mode) {
-		return null;
+		/*String Query="select ID from my_file where size>(?) and size<(?)";
+		PreparedStatement pStmt;
+		ResultSet rs;
+		LinkedList<String> lst=new LinkedList<String>();
+		try{
+			if(mode.equals("acs")) Query+="order by size acs";
+			else if(mode.equals("desc")) Query+="order by size desc";
+			else{
+				System.err.println("不能识别模式");
+				return null;
+			}
+			pStmt=conn.prepareStatement(Query);
+			pStmt.setLong(1,minKb*1024);
+			pStmt.setLong(2, maxKb*1024);
+			rs=pStmt.executeQuery();
+			while(rs.next()){
+				int ID=rs.getInt(1);
+				String absolutePath=getAbsolutePathByID(ID);
+				lst.add(absolutePath);
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}*/
+		LinkedList<String> lst=executeFileQuery("",minKb,maxKb,0,0,1,mode);
+		return lst;
 	}
 
 	@Override
 	public LinkedList<String> fileFilterByLastModifiedTime(long startTime, long endTime, String mode) {
-		return null;
+		LinkedList<String> lst=executeFileQuery("",0,0,startTime,endTime,2,mode);
+		return lst;
 	}
 
 	@Override
 	public LinkedList<String> fileFilterByLastModifiedTimeAndSize(long startTime, long endTime, long minKb, long maxKb, String mode) {
-		return null;
+		LinkedList<String> lst=executeFileQuery("",minKb,maxKb,startTime,endTime,3,mode);
+		return lst;
 	}
 
 	@Override
 	public LinkedList<String> fileFilterBySizeAndName(String name, long minKb, long maxKb, String mode) {
-		return null;
+		LinkedList<String> lst=executeFileQuery(name,minKb,maxKb,0,0,4,mode);
+		return lst;
 	}
 
 	@Override
 	public LinkedList<String> fileFilterByLastModifiedTimeAndName(String name, long startTime, long endTime, String mode) {
-		return null;
+		LinkedList<String> lst=executeFileQuery(name,0,0,startTime,endTime,5,mode);
+		return lst;
 	}
 
 	@Override
 	public LinkedList<String> fileFilterByLastModifiedTimeAndSizeAndName(String name, long startTime, long endTime, long minKb, long maxKb, String mode) {
-		return null;
+		LinkedList<String> lst=executeFileQuery(name,minKb,maxKb,startTime,endTime,6,mode);
+		return lst;
 	}
 
 	@Override
@@ -452,6 +521,109 @@ public class DBTest implements CourseDesignModel{
 	@Override
 	public LinkedList<String> folderFilterByLastModifiedTimeAndSizeAndName(String name, long startTime, long endTime, long minKb, long maxKb, String mode) {
 		return null;
+	}
+	
+	public String generateFileQuery(int mode,String order){
+		String query="select ID from my_file where ";
+		String queryName=" name likes (?) ";
+		String querySize=" size>(?) and size<(?) ";
+		String queryTime=" lastModifyTime>(?) and lastModifyTime<(?) ";
+		String orderBy=" order by ";
+		switch(mode){
+		case 0:{
+			query+=queryName+orderBy+" name ";
+			break;
+		}
+		case 1:{
+			query+=querySize+orderBy+" size ";
+			break;
+		}
+		case 2:{
+			query+=queryTime+orderBy+" lastModifyTime ";
+			break;
+		}
+		case 3:{
+			query+=queryTime+" and "+querySize+orderBy+" lastModifyTime , size ";
+			break;
+		}
+		case 4:{
+			query+=querySize+" and "+queryName+orderBy+" size,name ";
+			break;
+		}
+		case 5:{
+			query+=queryTime+" and "+queryName+orderBy+" lastModifyTime,name ";
+			break;
+		}
+		case 6:{
+			query+=queryName+" and "+queryTime+" and "+querySize+orderBy+" lastModifyTime,size,name ";
+			break;
+ 		}
+		}
+		if(order.equals("asc")) query+=" asc ;";
+		else query+=" desc ;";
+		return query;
+	}
+	public LinkedList<String> executeFileQuery(String name,long minKb,long maxKb,long startTime,long endTime,int mode,String order){
+		String query=generateFileQuery(mode,order);
+		PreparedStatement pStmt;
+		LinkedList<String> lst=new LinkedList<String>();
+		try{
+			pStmt=conn.prepareStatement(query);
+			switch(mode){
+			case 0:{
+				pStmt.setString(1, "%"+name+"%");
+				break;
+			}
+			case 1:{
+				pStmt.setLong(1,minKb*1024);
+				pStmt.setLong(2, maxKb*1024);
+				break;
+			}
+			case 2:{
+				pStmt.setLong(1, startTime);
+				pStmt.setLong(2, endTime);
+				break;
+			}
+			case 3:{
+				pStmt.setLong(1, startTime);
+				pStmt.setLong(2, endTime);
+				pStmt.setLong(3, minKb*1024);
+				pStmt.setLong(4, maxKb*1024);
+				break;
+			}
+			case 4:{
+				pStmt.setLong(1,minKb*1024);
+				pStmt.setLong(2, maxKb*1024);
+				pStmt.setString(3, "%"+name+"%");
+				break;
+			}
+			case 5:{
+				pStmt.setLong(1, startTime);
+				pStmt.setLong(2, endTime);
+				pStmt.setString(3, "%"+name+"%");
+				break;
+			}
+			case 6:{
+				pStmt.setString(1, "%"+name+"%");
+				pStmt.setLong(2, startTime);
+				pStmt.setLong(3, endTime);
+				pStmt.setLong(4,minKb*1024);
+				pStmt.setLong(5, maxKb*1024);
+				break;
+			}
+			}
+			ResultSet rs=pStmt.executeQuery();
+			while(rs.next()){
+				int ID=rs.getInt(1);
+				String absolutePath=getAbsolutePathByID(ID);
+				lst.add(absolutePath);
+				
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		return lst;
+		
 	}
 
 //	@Override
