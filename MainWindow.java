@@ -442,9 +442,9 @@ public class MainWindow {
                         }
                     }
                 }
-                fl=new LinkedList();
-                fl.add("E:\\aaaa\\bbbb");
-                fl.add("D:\\aaaa\\bddddb");
+                //fl=new LinkedList();
+                //fl.add("E:\\aaaa\\bbbb");
+                //fl.add("D:\\aaaa\\bddddb");
                 //将两个列表输出到namelist和poslist视图区
                 DefaultListModel dlm1=new DefaultListModel();
                 DefaultListModel dlm2=new DefaultListModel();
