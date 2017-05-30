@@ -3,7 +3,7 @@ package com.db;
 import java.sql.*;
 import java.util.*;
 import java.io.File;
-import java.security.Timestamp;
+//import java.security.Timestamp;
 
 
 public class DBTest implements CourseDesignModel{
@@ -294,12 +294,108 @@ public class DBTest implements CourseDesignModel{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
-	public LinkedList<String> filterByLastModifiedTime(Timestamp startTime, Timestamp endTime, String mode) {
-		// TODO Auto-generated method stub
+	public LinkedList<String> filterByLastModifiedTime(long startTime, long endTime, String mode) {
 		return null;
 	}
-	public void setCurID(int cur_id){
-		this.cur_id=cur_id;
+
+	@Override
+	public LinkedList<String> filterByLastModifiedTimeAndSize(long startTime, long endTime, long minKb, long maxKb, String mode) {
+		return null;
 	}
+
+	@Override
+	public LinkedList<String> filterBySizeAndName(String name, long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> filterByLastModifiedTimeAndName(String name, long startTime, long endTime, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> filterByLastModifiedTimeAndSizeAndName(String name, long startTime, long endTime, long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> fileFilterByName(String name, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> fileFilterBySize(long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> fileFilterByLastModifiedTime(long startTime, long endTime, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> fileFilterByLastModifiedTimeAndSize(long startTime, long endTime, long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> fileFilterBySizeAndName(String name, long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> fileFilterByLastModifiedTimeAndName(String name, long startTime, long endTime, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> fileFilterByLastModifiedTimeAndSizeAndName(String name, long startTime, long endTime, long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> folderFilterByName(String name, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> folderFilterBySize(long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> folderFilterByLastModifiedTime(long startTime, long endTime, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> folderFilterByLastModifiedTimeAndSize(long startTime, long endTime, long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> folderFilterBySizeAndName(String name, long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> folderFilterByLastModifiedTimeAndName(String name, long startTime, long endTime, String mode) {
+		return null;
+	}
+
+	@Override
+	public LinkedList<String> folderFilterByLastModifiedTimeAndSizeAndName(String name, long startTime, long endTime, long minKb, long maxKb, String mode) {
+		return null;
+	}
+
+//	@Override
+//	public LinkedList<String> filterByLastModifiedTime(Timestamp startTime, Timestamp endTime, String mode) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//	public void setCurID(int cur_id){
+//		this.cur_id=cur_id;
+//	}
 }
