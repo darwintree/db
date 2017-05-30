@@ -2,6 +2,9 @@ package com.db;
 
 import java.sql.*;
 import java.util.*;
+
+
+
 import java.io.File;
 //import java.security.Timestamp;
 
@@ -134,15 +137,11 @@ public class DBTest implements CourseDesignModel{
 			ID=getIDDirect(splitedName[i],ID);
 		return ID;
 	}
-	/*public static void main(String args[]){
+	public static void main(String args[]){
 		String rootPath="g:\\";
 		DBTest dbt=new DBTest();
-		//dbt.initDB(rootPath);
-		//int ID=dbt.getID(rootPath);
-		//System.out.println(ID);
-		dbt.onCreate("g:\\", "newfolder01");
-
-	}*/
+		dbt.initDB(rootPath);
+	}
 	public void deleteFileDirect(int ID){ //直接按ID删除一条my_file 中的记录
 		String Query="delete from my_file where ID=(?)";
 		PreparedStatement pStmt;
@@ -166,17 +165,23 @@ public class DBTest implements CourseDesignModel{
 		}
 	}
 	public void deleteFile(String absolutePath){ //按绝对路径删除一条记录
-		File currentFile=new File(absolutePath);
 		int ID=getID(absolutePath);
-		//System.out.println("删除id为"+ID +", path为 "+absolutePath+" 的文件");
-		if(currentFile.isFile()){
-			deleteFileDirect(ID); //如果该文件是文件类型；直接删除即可
-		}else{
-			/*File [] flist=currentFile.listFiles();//否者先递归删除其子文件
-			if(flist!=null){
-				for(File i:flist) deleteFile(i.getAbsolutePath()); 
-			}*/
-			deleteFolderDirect(ID); //在直接删除目录本身
+		PreparedStatement pStmt1,pStmt2;
+		String Query1="select * from my_file where ID=(?)";
+		String Query2="select * from my_folder where ID=(?)";
+		try{
+			pStmt1=conn.prepareStatement(Query1);
+			pStmt2=conn.prepareStatement(Query2);
+			pStmt1.setInt(1, ID);
+			pStmt2.setInt(1, ID);
+			ResultSet rs1=pStmt1.executeQuery();
+			if(rs1.next()) {
+				deleteFileDirect(ID);
+			}else{
+				deleteFolderDirect(ID);
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
 		}
 		return;
 	}
@@ -196,20 +201,48 @@ public class DBTest implements CourseDesignModel{
 		}
 		return depth;
 	}
+	public int getCurMaxID(){
+		String Query1="select max(ID) from my_file";
+		String Query2="select max(ID) from my_folder";
+		PreparedStatement pStmt1;
+		PreparedStatement pStmt2;
+		int curMaxID=0;
+		try{
+			pStmt1=conn.prepareStatement(Query1);
+			pStmt2=conn.prepareStatement(Query2);
+			ResultSet rs1=pStmt1.executeQuery();
+			ResultSet rs2=pStmt2.executeQuery();
+			if(rs1.next()) if(rs1.getInt(1)>curMaxID) curMaxID=rs1.getInt(1);
+			if(rs2.next()) if(rs2.getInt(1)>curMaxID) curMaxID=rs2.getInt(1);
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		return curMaxID;
+	}
+	public void setCurID(int cur_id){
+		this.cur_id=cur_id;
+	}
 	@Override
 	public void onModify(String rootPath, String name){
-		int ID=getID(rootPath+name); //获取当前文件的ID
+		int ID=getID(rootPath+name); //��ȡ��ǰ�ļ���ID
 		File currentFile=new File(rootPath+name);
 		String Query;
 		long size=currentFile.length();
 		long occupiedSpace=(size+1024)/1024*1024;
 		PreparedStatement pStmt;
 		try{
-			if(currentFile.isDirectory()) Query="update my_folder set lastModifyTime = (?) where ID=(?)";
-			else Query="update my_file set lastModifyTime = (?) where ID=(?)";
+			if(!currentFile.isDirectory()) Query="update my_file set lastModifyTime = (?),size=(?),occupied_space=(?) where ID=(?)";
+			else Query="update my_folder set lastModifyTime = (?) where ID=(?)";
 			pStmt=conn.prepareStatement(Query);
-			pStmt.setLong(1, currentFile.lastModified());
-			pStmt.setInt(2, ID);
+			if(currentFile.isDirectory()){
+				pStmt.setLong(1,currentFile.lastModified());
+				pStmt.setInt(2, ID);
+			}else{
+				pStmt.setLong(1, currentFile.lastModified());
+				pStmt.setLong(2,size);
+				pStmt.setLong(3, occupiedSpace);
+				pStmt.setInt(4, ID);
+			}
 			pStmt.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
