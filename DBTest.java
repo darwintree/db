@@ -140,9 +140,12 @@ public class DBTest implements CourseDesignModel{
 		return ID;
 	}
 	public static void main(String args[]){
-		String rootPath="e:\\newFolder";
+		
 		DBTest dbt=new DBTest();
-		dbt.initDB(rootPath);
+		dbt.rootPath="e:\\newFolder";
+		dbt.initDB(dbt.rootPath);
+		//System.out.println(dbt.getAbsolutePathByID(5));
+		
 	}
 	public void deleteFileDirect(int ID){ //直接按ID删除一条my_file 中的记录
 		String Query="delete from my_file where ID=(?)";
@@ -225,6 +228,7 @@ public class DBTest implements CourseDesignModel{
 		this.cur_id=cur_id;
 	}
 	public String getAbsolutePathByID(int ID){
+		
 		String Query1="select * from my_file where ID=(?)";
 		String Query2="select * from my_folder where ID=(?)";
 		int parentID=0;
@@ -243,7 +247,7 @@ public class DBTest implements CourseDesignModel{
 				parentID=rs1.getInt(3);
 				name=rs1.getString(2);
 			}
-			else{
+			else if(rs2.next()){
 				parentID=rs2.getInt(3);
 				name=rs2.getString(2);
 			}
@@ -252,7 +256,7 @@ public class DBTest implements CourseDesignModel{
 			e.printStackTrace();
 		}
 		if(parentID==0) return rootPath;
-		else return getAbsolutePathByID(parentID)+"\\"+name;
+		return getAbsolutePathByID(parentID)+"\\"+name;
 	}
 	@Override
 	public void onModify(String rootPath, String name){
