@@ -58,7 +58,7 @@ public class DBTest implements CourseDesignModel{
 			insertIntoFolder.setLong(4, lastModifiedTime);
 			insertIntoFolder.setInt(5, access);
 			insertIntoFolder.setInt(6, depth);
-			insertIntoFolder.setLong(7,size);
+			insertIntoFolder.setLong(7, -1);
 			insertIntoFolder.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -147,11 +147,12 @@ public class DBTest implements CourseDesignModel{
 		DBTest dbt=new DBTest();
 		dbt.rootPath="e:\\newFolder";
 		//dbt.initDB(dbt.rootPath);
-		LinkedList<String> lst=dbt.filterBySizeAndName("s",1024,4096, "asc");
-		for(String i:lst)
-			System.out.println(i);
-		System.out.print("finished");
+		//LinkedList<String> lst=dbt.filterBySizeAndName("s",1024,4096, "asc");
+		//for(String i:lst)
+			//System.out.println(i);
+		//System.out.print("finished");
 		//System.out.println(dbt.getAbsolutePathByID(5));
+		dbt.getSizeDP("e:\\newFolder");
 		
 	}
 	public void deleteFileDirect(int ID){ //直接按ID删除一条my_file 中的记录
@@ -800,6 +801,61 @@ public class DBTest implements CourseDesignModel{
 				else size+=getFolderSize(i.getAbsolutePath());
 		return size;
 	}
+	public long getSizeDP(String absolutePath){
+		File f=new File(absolutePath);
+		if(f.isFile()) return f.length();
+		String [] sub=absolutePath.split("\\\\");
+		String rP=sub[0];
+		int k=1;
+		while(!rP.equals(rootPath)) rP=rP+"\\"+sub[k++];
+		String name="";
+		
+		if(k<sub.length){
+			name=name+sub[k];
+			k++;
+			while(k<sub.length){
+				name=name+"\\"+sub[k];
+				k++;
+			}
+		}
+		//System.out.println(name);
+		int ID=getID(name);
+		PreparedStatement pStmt;
+		String query="select size from my_folder where ID=(?)";
+		long size=-1,init_size;
+		try{
+			pStmt=conn.prepareStatement(query);
+			pStmt.setInt(1, ID);
+			ResultSet rs=pStmt.executeQuery();
+			if(rs.next()){
+				size=rs.getLong(1);
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		if(size!=-1) return size;
+		else{
+			//update
+			init_size=0;
+			
+			File [] flist=f.listFiles();
+			for(File i:flist)
+				init_size+=getSizeDP(i.getAbsolutePath());
+			String updateFolder="update my_folder set size =(?) where ID=(?)";
+			try{
+				pStmt=conn.prepareStatement(updateFolder);
+				pStmt.setLong(1, init_size);
+				pStmt.setInt(2, ID);
+				pStmt.executeUpdate();
+			}catch(SQLException e){
+				e.printStackTrace();
+			}
+				
+		}
+		
+		return init_size;
+	}
+	
 //	@Override
 //	public LinkedList<String> filterByLastModifiedTime(Timestamp startTime, Timestamp endTime, String mode) {
 //		// TODO Auto-generated method stub
