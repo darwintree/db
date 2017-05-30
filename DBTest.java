@@ -31,6 +31,7 @@ public class DBTest implements CourseDesignModel{
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
+
 	}
 
 	void insertIntoFileValues(int id,String name,int parentDirID,long lastModifiedTime,long size,long occupiedSpace,int access,int depth){
@@ -143,7 +144,9 @@ public class DBTest implements CourseDesignModel{
 	public static void main(String args[]){
 		System.out.println("start..");
 		DBTest dbt=new DBTest();
-		dbt.initDB("e:\\newFolder");
+		dbt.rootPath = "e:\\newFolder";
+		//dbt.initDB("e:\\newFolder");
+		System.out.println(dbt.getAbsolutePathByID(123));
 		System.out.println("end..");
 
 	}
@@ -255,7 +258,7 @@ public class DBTest implements CourseDesignModel{
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
-		if(parentID==0) return rootPath;
+		if(parentID==0) return name;
 		return getAbsolutePathByID(parentID)+"\\"+name;
 	}
 	@Override
