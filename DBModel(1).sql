@@ -11,6 +11,7 @@ create table my_folder(
     lastModifyTime long,
     access int,
     depth int,
+    size int,
     primary key (ID),
     foreign key(parentDirID) references my_folder(ID) on delete cascade);
 
