@@ -846,6 +846,8 @@ public class MainWindow {
 			public void actionPerformed(ActionEvent e) {
 				// TODO 自动生成的方法存根
 				
+				String output=Long.toString(dbt.getSizeDP(selectpath)/1024);
+				JOptionPane.showMessageDialog(frame, output+"KB");
 				
 			}
 		});
