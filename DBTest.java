@@ -98,9 +98,10 @@ public class DBTest implements CourseDesignModel{
         return ret;
 	}
 	public void initDB(String rootPath){ //初始化数据库
+		this.rootPath = rootPath;
 		insertIntoFolderValues(0,"root",0,-1,-1,-1);
 		cur_id=0;
-		DFS(rootPath,cur_id,1); 
+		DFS(this.rootPath,cur_id,1);
 	}
 	public int getIDDirect(String name,int parentDirID){ //通过文件name与父目录的ID直接在数据库中查找文件ID
 		int ID=-1;
@@ -141,9 +142,8 @@ public class DBTest implements CourseDesignModel{
 	}
 	public static void main(String args[]){
 		System.out.println("start..");
-		String rootPath="e:\\newFolder";
 		DBTest dbt=new DBTest();
-		dbt.initDB(rootPath);
+		dbt.initDB("e:\\newFolder");
 		System.out.println("end..");
 
 	}
@@ -525,7 +525,7 @@ public class DBTest implements CourseDesignModel{
 	
 	public String generateFileQuery(int mode,String order){
 		String query="select ID from my_file where ";
-		String queryName=" name likes (?) ";
+		String queryName=" name like (?) ";
 		String querySize=" size>(?) and size<(?) ";
 		String queryTime=" lastModifyTime>(?) and lastModifyTime<(?) ";
 		String orderBy=" order by ";
