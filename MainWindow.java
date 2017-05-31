@@ -41,10 +41,13 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+
 
 public class MainWindow {
 
@@ -78,7 +81,14 @@ public class MainWindow {
      * Launch the application.
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
+    	 try
+    	    { 
+    		 	org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.launchBeautyEyeLNF();
+    	    } catch(Exception e)
+    	    { 
+    		//TODO exception 
+    	    } 
+        EventQueue.invokeLater(new Runnable() {       	 
             public void run() {
                 try {
                     MainWindow window = new MainWindow();
@@ -830,8 +840,20 @@ public class MainWindow {
 				
 			}
 		});
+        JMenuItem size3=new JMenuItem("显示大小");
+        size3.addActionListener(new ActionListener() {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自动生成的方法存根
+				
+				String output=Long.toString(dbt.getSizeDP(selectpath)/1024);
+				JOptionPane.showMessageDialog(frame, output+"KB");
+				
+			}
+		});
         popmenu.add(openfile1);
         popmenu.add(openfile2);
+        popmenu.add(size3);
     }
 
 
