@@ -26,14 +26,14 @@ public class DBTest implements CourseDesignModel{
 		url="jdbc:mysql://localhost:3306/myFileSystem?useUnicode=true&characterEncoding=utf-8&useSSL=false";
 		try{
 			conn=DriverManager.getConnection(url,"newuser","newuser"); //用户名,密码
-			insertIntoFile=conn.prepareStatement("insert into my_file values (?,?,?,?,?,?,?,?);");
+			insertIntoFile=conn.prepareStatement("insert into my_file values (?,?,?,?,?,?,?);");
 			insertIntoFolder=conn.prepareStatement("insert into my_folder values (?,?,?,?,?,?,?);");
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
 
-	void insertIntoFileValues(int id,String name,int parentDirID,long lastModifiedTime,long size,long occupiedSpace,int access,int depth){
+	void insertIntoFileValues(int id,String name,int parentDirID,long lastModifiedTime,long size,int access,int depth){
 		//插入一条记录到my_file表中
 		try{
 			insertIntoFile.setInt(1, id);
@@ -41,9 +41,8 @@ public class DBTest implements CourseDesignModel{
     		insertIntoFile.setInt(3,parentDirID);
     		insertIntoFile.setLong(4, lastModifiedTime);
     		insertIntoFile.setLong(5, size);
-    		insertIntoFile.setLong(6, occupiedSpace);
-    		insertIntoFile.setInt(7, access);
-    		insertIntoFile.setInt(8, depth);
+    		insertIntoFile.setInt(6, access);
+    		insertIntoFile.setInt(7, depth);
     		insertIntoFile.executeUpdate();
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -87,7 +86,7 @@ public class DBTest implements CourseDesignModel{
         cur_id++;
         int FileID=cur_id;
         if(!isFolder){
-    		insertIntoFileValues(FileID,name,parentDirID,lastModifiedTime,size,occupiedSpace,access,curDepth);
+    		insertIntoFileValues(FileID,name,parentDirID,lastModifiedTime,size,access,curDepth);
     	}else{
     		size=getFolderSize(currentFile.getAbsolutePath());
     		insertIntoFolderValues(FileID,name,parentDirID,lastModifiedTime,access,curDepth,size);
@@ -146,7 +145,7 @@ public class DBTest implements CourseDesignModel{
 		
 		DBTest dbt=new DBTest();
 		dbt.rootPath="e:\\newFolder";
-		//dbt.initDB(dbt.rootPath);
+		dbt.initDB(dbt.rootPath);
 		//LinkedList<String> lst=dbt.filterBySizeAndName("s",1024,4096, "asc");
 		//for(String i:lst)
 			//System.out.println(i);
@@ -275,7 +274,7 @@ public class DBTest implements CourseDesignModel{
 		long occupiedSpace=(size+1024)/1024*1024;
 		PreparedStatement pStmt;
 		try{
-			if(!currentFile.isDirectory()) Query="update my_file set lastModifyTime = (?),size=(?),occupied_space=(?) where ID=(?)";
+			if(!currentFile.isDirectory()) Query="update my_file set lastModifyTime = (?),size=(?) where ID=(?)";
 			else Query="update my_folder set lastModifyTime = (?),size=(?) where ID=(?)";
 			pStmt=conn.prepareStatement(Query);
 			if(currentFile.isDirectory()){
@@ -286,8 +285,7 @@ public class DBTest implements CourseDesignModel{
 			}else{
 				pStmt.setLong(1, currentFile.lastModified());
 				pStmt.setLong(2,size);
-				pStmt.setLong(3, occupiedSpace);
-				pStmt.setInt(4, ID);
+				pStmt.setInt(3, ID);
 			}
 			pStmt.executeUpdate();
 		}catch(SQLException e){
@@ -346,7 +344,7 @@ public class DBTest implements CourseDesignModel{
 			size=getFolderSize(currentFile.getAbsolutePath());
 			insertIntoFolderValues(ID,sub[sub.length-1],parentID,lastModifiedTime,access,depth+1,size); 
 		}
-		else insertIntoFileValues(ID,sub[sub.length-1],parentID,lastModifiedTime,size,occupiedSpace,access,depth+1);
+		else insertIntoFileValues(ID,sub[sub.length-1],parentID,lastModifiedTime,size,access,depth+1);
 	}
 	@Override
 	public void onDelete(String rootPath, String name) {
@@ -854,6 +852,23 @@ public class DBTest implements CourseDesignModel{
 		}
 		
 		return init_size;
+	}
+	public long getFolderSizeDirect(String absolutePath){
+		int ID=getID(absolutePath);
+		String query="select size from my_folder where ID=(?)";
+		PreparedStatement pStmt;
+		long size=-1;
+		try{
+			pStmt=conn.prepareStatement(query);
+			pStmt.setInt(1, ID);
+			ResultSet rs=pStmt.executeQuery();
+			while(rs.next()){
+				size=rs.getLong(1);
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+		return size;
 	}
 	
 //	@Override

@@ -35,7 +35,7 @@ public class Main {
         db.setCurID(db.getCurMaxID());
         int watchID = JNotify.addWatch(path, mask, subTree, new FileWatcher(m));
         //睡一会，看看效果
-        Thread.sleep(1000 * 60 * 3);
+        Thread.sleep(10000 * 60 * 3);
         //停止监控
         boolean res = JNotify.removeWatch(watchID);
         if (res) {
