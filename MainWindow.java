@@ -270,7 +270,7 @@ public class MainWindow {
 					textField.setText("1");
 				if(!useSize&&!useTime)
 					textField.setText("0");*/
-                //fl.add("E:\\sdsd\\aaaa");
+                //fl.add("E:\\sdsd\\aaaa");           	
                 if(typefile==0&&typefolder==0){
                     JOptionPane.showMessageDialog(frame, "请选择搜索类型");
                     return;
@@ -492,8 +492,14 @@ public class MainWindow {
                 DefaultListModel dlm2=new DefaultListModel();
                 DefaultListModel dlm3=new DefaultListModel();
                 DefaultListModel dlm4=new DefaultListModel();
-                if(fl==null){
+                if(fl==null||fl.isEmpty()){
                     System.out.println("fl is null!");
+                    dlm1.addElement("No mached fill/folder");
+                    nameList.setModel(dlm1);
+                    posList.setModel(dlm2);
+                    sizeList.setModel(dlm3);
+                    timeList.setModel(dlm4);
+                    
                 }
                 if(fl!=null&&!fl.isEmpty()){
                     for(String str:fl){
@@ -533,7 +539,7 @@ public class MainWindow {
                     sl.clear();
                     tl.clear();
                 }
-
+                	
 
                 //
 
